@@ -1,13 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import Elf from "./pages/elf";
 import reportWebVitals from './reportWebVitals';
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+
+const BASE_PATH = "santa"
+
+
+const router = createBrowserRouter([
+  {
+    path: `${BASE_PATH}/:elfId`,
+    element: <Elf />,
+
+  },
+]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
+  <React.StrictMode>    <RouterProvider router={router} />
   </React.StrictMode>
 );
 
