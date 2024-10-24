@@ -1,24 +1,14 @@
 import { useState, useEffect } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { getElf } from "../utils";
+import { useParams } from "react-router-dom";
+import { getElf, deleteListItem } from "../utils";
 import SantaList from "../components/santaList";
 
 export default function Elf() {
 
-    // const location = useLocation();
-    // const [pathName, setPathName] = useState("null");
     const [elfData, setElfData] = useState(null)
+    const [elfList, setElfList] = useState([])
 
     const { elfId } = useParams()
-
-    // useEffect(() => {
-    //     if (location) {
-    //         console.log(props.match)
-    //         // let tmp = location.pathName.slice(location.pathName.lastIndexOf("/"), location.pathName.length);
-    //         // setPathName(tmp);
-    //     }
-
-    // }, [location])
 
     useEffect(() => {
         if (elfId) {
@@ -29,7 +19,23 @@ export default function Elf() {
 
     }, [elfId])
 
-    if(!elfData) return (<></>)
+    useEffect(() => {
+        if(elfData) {
+            setElfList(elfData.list)
+        }
+    }, [elfData])
+
+    const onDeleteListItem = (id) => {
+        deleteListItem(elfId, id)
+        const newElfData = getElf(elfId)
+
+        if(newElfData) {
+            setElfList(newElfData.list)
+        }
+    }
+
+
+    if (!elfData) return (<></>)
 
     return (
         <div className="container">
@@ -44,11 +50,10 @@ export default function Elf() {
                 </div>
             </nav>
             <div className="tab-content" id="nav-tabContent">
-                <div className="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="self-tab">your list</div>
+                <div className="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="self-tab"><SantaList list={elfList}
+                    editable onDelete={onDeleteListItem} /></div>
                 <div className="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="santa-tab"><SantaList list={elfData.santaToObject.list}
-                editable onDelete={(id) => console.log("clicked on " + id)}
-                
-                /></div>
+                    editable={false} /></div>
             </div>
         </div>
     )
