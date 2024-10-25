@@ -99,8 +99,9 @@ export function deleteListItem(elfId, listItemId) {
 
 }
 
-// export function saveList(id, list) {
-//     localStorage.setItem('items', JSON.stringify(items));
-// }
+export function saveListForElf(id, list) {
+    localStorage.setItem(id, JSON.stringify(list));
+    return getListForElf(id)
+}
 
 init()
