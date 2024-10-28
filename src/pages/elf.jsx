@@ -5,6 +5,7 @@ import SantaList from "../components/santaList";
 
 export default function Elf() {
 
+    const [loadingMessage, setLoadingMessage] = useState("Loading...")
     const [elfData, setElfData] = useState(null)
     const [elfList, setElfList] = useState([])
     const [newListItemLink, setNewListItemLink] = useState("")
@@ -17,7 +18,9 @@ export default function Elf() {
         if (elfId) {
             const data = getElf(elfId)
             setElfData(data)
-            if (!data) throw new Error("User not found")
+            if (!data) {
+                setLoadingMessage("Hmmm something went wrong. Do you have the correct url?")
+            }
         }
 
     }, [elfId])
@@ -53,8 +56,25 @@ export default function Elf() {
         input(event.target.value)
     
       }
+
+      function isValidHttpUrl(string) {
+        let url;
+        
+        try {
+          url = new URL(string);
+        } catch (_) {
+          return false;  
+        }
+      
+        return url.protocol === "http:" || url.protocol === "https:";
+      }
     
       const onSubmit = () => {
+
+        if(!isValidHttpUrl(newListItemLink)) {
+            setErrorMessage("Link is not a valid url")
+            return
+        }
         // axios.post('/hijames', {name, message})
         //   .then(function (response) {
         //     clearError()
@@ -106,15 +126,13 @@ export default function Elf() {
       )
 
 
-    if (!elfData) return (<></>)
+    if (!elfData) return (<>{loadingMessage}</>)
 
     return (
         <div className="container">
             <h1 className="text-center">Secret Santa!</h1>
 
             <p>Hi <strong>{elfData.name}</strong>! You're the secret santa for <strong>{elfData.santaToObject.name}</strong></p>
-
-            {errorAlert}
 
             <nav>
                 <div className="nav nav-tabs" id="nav-tab" role="tablist">
@@ -127,6 +145,7 @@ export default function Elf() {
                     <div className="container"><SantaList list={elfList} editable onDelete={onDeleteListItem} /></div>
                     
                     <div className="container mt-5">
+                        {errorAlert}
                         <h3>Add Item</h3>{newItemForm}</div>
                     </div>
                 <div className="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="santa-tab"><SantaList list={elfData.santaToObject.list}
