@@ -14,9 +14,9 @@ export default function Elf() {
 
     const { elfId } = useParams()
 
-    useEffect(() => {
+    useEffect(async () => {
         if (elfId) {
-            const data = getElf(elfId)
+            const data = await getElf(elfId)
             setElfData(data)
             if (!data) {
                 setLoadingMessage("Hmmm something went wrong. Do you have the correct url?")
@@ -31,9 +31,9 @@ export default function Elf() {
         }
     }, [elfData])
 
-    const onDeleteListItem = (id) => {
-        deleteListItem(elfId, id)
-        const newElfData = getElf(elfId)
+    const onDeleteListItem = async (id) => {
+        await deleteListItem(elfId, id)
+        const newElfData = await getElf(elfId)
 
         if (newElfData) {
             setElfList(newElfData.list)
@@ -69,29 +69,18 @@ export default function Elf() {
         return url.protocol === "http:" || url.protocol === "https:";
       }
     
-      const onSubmit = () => {
+      const onSubmit = async () => {
 
         if(!isValidHttpUrl(newListItemLink)) {
-            setErrorMessage("Link is not a valid url")
+            setErrorMessage("Link is not a valid url. Don't forget to add https:// to the beginning!")
             return
         }
-        // axios.post('/hijames', {name, message})
-        //   .then(function (response) {
-        //     clearError()
-        //     setName("")
-        //     setMessage("")
-        //   })
-        //   .catch(function (response) { 
-        //     const errorMessage = response?.response?.data ? response.response.data : "Error submitting request"
-    
-        //     setErrorMessage(errorMessage)
-        //   });
 
         const newList = elfList
         const newListItem = {"id": crypto.randomUUID(), "link": newListItemLink, "notes": newListnewListItemLinkNotes} //TODO input validation
         newList.push(newListItem)
 
-        const savedList = saveListForElf(elfData.id, newList) // TODO error checking
+        const savedList = await saveListForElf(elfData.id, newList) // TODO error checking
         setElfList(savedList)
 
         setNewListItemLink("")
@@ -134,10 +123,12 @@ export default function Elf() {
 
             <p>Hi <strong>{elfData.name}</strong>! You're the secret santa for <strong>{elfData.santaToObject.name}</strong></p>
 
+            <p>Please add items to your list below and click on the <strong>{elfData.santaToObject.name}'s Wish List</strong> tab to see what {elfData.santaToObject.name} has on their list</p>
+
             <nav>
                 <div className="nav nav-tabs" id="nav-tab" role="tablist">
                     <button className="nav-link active" id="self-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Your list</button>
-                    <button className="nav-link" id="santa-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">{elfData.santaToObject.name}'s list</button>
+                    <button className="nav-link" id="santa-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">{elfData.santaToObject.name}'s Wish list</button>
                 </div>
             </nav>
             <div className="tab-content" id="nav-tabContent">

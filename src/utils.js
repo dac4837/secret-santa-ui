@@ -1,107 +1,55 @@
-/*
-Elf
-
-id
-name
-excludes
-santa to
-list
+import axios from "axios";
 
 
-List
+async function getListForElf(id) {
 
-id
-link
-notes
+    try {
+        const response = await axios.get('/elfList/' + id);
 
+        console.log(response)
+        return response.data;
+    } catch (error) {
+        const errorMessage = error?.response?.data ? error.response.data : `Error getting elf ${id}`;
+        console.error(errorMessage);
 
-*/
-
-const data = [
-    {
-        "id": "1111",
-        "name": "Sarah",
-        "excludes": ["9999"],
-        "santaTo": "2222"
-    },
-    {
-        "id": "2222",
-        "name": "David",
-        "excludes": [],
-        "santaTo": "1111"
+        throw new Error("Error getting elf. Do you have the right url?");
     }
-
-]
-
-const sampleList = [
-    {
-        "id": "aa",
-        "link": "https://www.amazon.com/STA-BIL-22214-Fuel-Stabilizer-Fluid_Ounces/dp/B000B68V6I",
-        "notes": "It's oil"
-    },
-    {
-        "id": "bb",
-        "link": "https://chipotle.com"
-    }
-]
-
-
-function init() {
-    data.forEach(d => {
-        if(!localStorage.getItem(d.id)) {
-            localStorage.setItem(d.id, JSON.stringify(sampleList))
-        }
-
-    })
 }
 
-function getListForElf(id) {
-    let list = []
-    const rawList = localStorage.getItem(id)
+export async function getElf(id) {
+    try {
+        const response = await axios.get('/elf/' + id);
 
-    if(rawList) {
-        list = JSON.parse(rawList)
+        return response.data
+
+    } catch (error) {
+        const errorMessage = error?.response?.data ? error.response.data : `Error getting elf ${id}`;
+        console.error(errorMessage);
+
+        throw new Error("Error getting elf.");
     }
-
-    return list
     
 }
 
-export function getElf(id) {
-
-    let elf = null
-    const elves = data.filter(e => e.id === id)
-
-    if(elves.length > 0) {
-
-        elf = elves[0]
-
-        elf.list = getListForElf(elf.id)
-
-        const santaObjects = data.filter(d => d.id === elf.santaTo);
-
-        if(santaObjects.length > 0) {
-            elf.santaToObject = santaObjects[0]
-            elf.santaToObject.list = getListForElf(elf.santaToObject.id)
-        }
-
-    } 
-    return elf
-}
-
-export function deleteListItem(elfId, listItemId) {
-    const list = getListForElf(elfId);
+export async function deleteListItem(elfId, listItemId) {
+    const list = await getListForElf(elfId);
 
     const newList = list.filter(e => e.id !== listItemId);
 
-    localStorage.setItem(elfId, JSON.stringify(newList))
-
+    saveListForElf(elfId, newList)
 
 }
 
-export function saveListForElf(id, list) {
-    localStorage.setItem(id, JSON.stringify(list));
-    return getListForElf(id)
-}
+export async function saveListForElf(id, list) {
+    try {
+        await axios.put('/elfList/' + id, list);
 
-init()
+        return await getListForElf(id)
+    } catch (error) {
+        const errorMessage = error?.response?.data ? error.response.data : `Error getting elf ${id}`;
+        console.error(errorMessage);
+
+        throw new Error("Error saving elf list");
+    }
+
+}
