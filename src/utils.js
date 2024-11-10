@@ -6,7 +6,6 @@ async function getListForElf(id) {
     try {
         const response = await axios.get('/elfList/' + id);
 
-        console.log(response)
         return response.data;
     } catch (error) {
         const errorMessage = error?.response?.data ? error.response.data : `Error getting elf ${id}`;

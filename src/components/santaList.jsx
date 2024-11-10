@@ -18,6 +18,14 @@ export default function SantaList(props) {
         )
     })
 
+    if(listItems.length == 0) {
+        listItems.push(
+            <li className="list-group-item">
+                No items yet!
+            </li>
+        )
+    }
+
     return (
         <ul className="list-group">
             {listItems}
